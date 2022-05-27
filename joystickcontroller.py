@@ -33,31 +33,31 @@ class JoystickController(Controller):
 
     # L_X
     def on_L3_left(self, value):
-        self.motorcontroller.carcontroller.data["L_X"] = value / 32767
+        self.motorcontroller.robotcontroller.data["L_X"] = value / 32767
 
     def on_L3_right(self, value):
-        self.motorcontroller.carcontroller.data["L_X"] = value / 32767
+        self.motorcontroller.robotcontroller.data["L_X"] = value / 32767
 
     def on_L3_x_at_rest(self):
-        self.motorcontroller.carcontroller.data["L_X"] = 0
+        self.motorcontroller.robotcontroller.data["L_X"] = 0
 
     # L_Y
     def on_L3_up(self, value):
-        self.motorcontroller.carcontroller.data["L_Y"] = value / 32767
+        self.motorcontroller.robotcontroller.data["L_Y"] = value / 32767
 
     def on_L3_down(self, value):
-        self.motorcontroller.carcontroller.data["L_Y"] = value / 32767
+        self.motorcontroller.robotcontroller.data["L_Y"] = value / 32767
 
     def on_L3_y_at_rest(self):
-        self.motorcontroller.carcontroller.data["L_Y"] = 0
+        self.motorcontroller.robotcontroller.data["L_Y"] = 0
 
     # functions for the "share" button, that is used to exit the program
     # SHARE
     def on_share_press(self):
-        self.motorcontroller.carcontroller.data["SHARE"] = 1
+        self.motorcontroller.robotcontroller.data["SHARE"] = 1
         # print("exiting program")
         self.motorcontroller.reset()
 
     def on_share_release(self):
-        self.motorcontroller.carcontroller.data["SHARE"] = 0
-        self.motorcontroller.carcontroller.data["DONE"] = True
+        self.motorcontroller.robotcontroller.data["SHARE"] = 0
+        self.motorcontroller.robotcontroller.data["DONE"] = True
