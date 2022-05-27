@@ -12,6 +12,11 @@ class MotorController(object):
     MOTOR_2_CHANNEL = 13  # channel for motor 2
     SERVO_1_CHANNEL = 14  # channel for servo 1 (currently not used)
     LED_CHANNEL = 15  # channel for the LED that indicates that the program is running
+
+    # the duty cycle values are 16 bit integers, but the PCA9685 chip only supports 12 bit resolution,
+    # so the duty cycle values are a not accurate, because of the shifting
+    # the controlling pwm signal should have 20 ms period, the minimum duty cycle should be 1 ms (5%)
+    # and the maximum duty cycle should be 2 ms (10%)
     MINIMUM = int(hex(65535 // 20), 16)  # minimum value for the motors PWM signal
     MAXIMUM = int(hex(65535 // 10), 16)  # maximum value for the motors PWM signal
     # neutral value for the motors PWM signal (the value that is used when the motors are not moving,
@@ -63,7 +68,7 @@ class MotorController(object):
 
     # the function that is called to control the motor 1 forward/backwards
     def throttle_motor_1(self, value: float) -> None:
-        # setting the duty cycle pf the motor channels to the value which calculated as:
+        # setting the duty cycle of the motor channels to the value which calculated as:
         # the neutral value plus the distance to the neutral value multiplied by the value parameter,
         # the middlepoint is the neutral value, the value parameter is the scaled value of the joystick input (-1 to 1),
         # the distance to the neutral value is the distance between the minimum and the neutral value
