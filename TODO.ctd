@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<cherrytree>
+	<node custom_icon_id="0" foreground="" is_bold="False" name="TODO" prog_lang="custom-colors" readonly="False" tags="" ts_creation="1653651689.6" ts_lastsave="1653652249.06" unique_id="1">
+		<rich_text>List of things to do:
+   •  Better documentation (maybe use pydoc?)
+   •  Exception handling
+   •  Logging
+   •  Handling the steering event
+   •  Using and handling the ultrasonic sensors
+   •  Maybe later change to 833 MHz, or 2.4GHz controller instead of ps4 controller with Bluetooth
+   •  New hardware(buck converter for the pi's powersupply, gears, and tracks)
+   •  Populate README.md with a description and a list of dependencies
+   •  Refactor code
+   • Maybe use asyncio instead of threads(?)</rich_text>
+	</node>
+</cherrytree>
