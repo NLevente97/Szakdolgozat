@@ -1,62 +1,85 @@
 from threading import Thread
 
 
+# the class to handle the input events
+# handling the actions based on the difference during the current  and previous state of the system
 class Eventhandler(object):
-    def __init__(self, carcontroller) -> None:
+    # intialize the event handler
+    def __init__(self, **kwargs) -> None:
         super().__init__()
-        self.carcontroller = carcontroller
-        self.prev_state = {**self.carcontroller.data}
-        self.current_state = {**self.carcontroller.data}
+        # reference to the robotcontroller
+        self.robotcontroller = kwargs["robotcontroller"]
+        # copying the data dictionary from the robotcontroller, so it wont be a reference but a new dictionary with the same values
+        self.prev_state = self.robotcontroller.data.copy()
+        self.current_state = self.robotcontroller.data.copy()
+        # list of actions to be executed
         self.actions = []
+        # flag to indicate if the state has changed
         self.changed = False
 
-    def handle_events(self):
-        while not self.carcontroller.data["DONE"]:
+    # the function that checks the current state and compares it to the previous state and handles the changes,
+    # and finally updates the previous state to the current state and the current state to the new state
+    def handle_events(self) -> None:
+        # looping until the program terminates
+        while not self.robotcontroller.data["DONE"]:
+            # checking the current state and the previous state for differences
             for key in self.current_state:
                 if self.prev_state[key] != self.current_state[key]:
-                    # print(key, self.prev_state[key], self.current_state[key])
-                    # print(key, self.prev_state[key], self.current_state[key])
+                    # if there is a change creating an event object with the current state value
                     e = Event(value=self.current_state[key])
+                    # checking for the keys that are currently handled by the program and setting an event type accordingly
                     if key == "L_Y":
                         self.changed = True
                         e.type = EventType.THROTTLE
 
+                    # adding the event object to the list of actions to be executed
                     self.actions.append(e)
+            # updating the previous state to the current state
             self.prev_state = self.current_state.copy()
-            self.current_state = {**self.carcontroller.data}
+            # updating the current state to the new state
+            self.current_state = self.robotcontroller.data.copy()
+            # if there is a change in the state, the actions are executed in a new thread,
+            # so it wont block the thread that is handling the events
             if self.changed:
+                # resetting the changed flag
                 self.changed = False
+                # creating a new thread to execute the actions, passing the copy of the actions list as a parameter
                 self.action_thread = Thread(
                     target=self.handle_actions, kwargs={"actions": self.actions.copy()}
                 )
+                # starting the thread
                 self.action_thread.start()
+            # resetting the actions list to be empty again
             self.actions = []
 
-    def handle_actions(self, **kwargs):
+    # the function that handles the actions, it takes the actions list as a parameter and executes the actions in the list
+    def handle_actions(self, **kwargs) -> None:
+        # using the kwargs.get() function, so if there is no action, it will return None and not an error
         actions = kwargs.get("actions")
+        # looping through the actions list
         for action in actions:
+            # handling the actions based on the event type
             if action.type == EventType.THROTTLE:
-                self.carcontroller.motorcontroller.throttle(action.value)
-
-    def steer_left(self, value):
-        pass
-
-    def steer_right(self, value):
-        pass
-
-    def refresh_controller(self):
-        pass
-
-    def change_controllermode(self):
-        pass
+                # for the THROTTLE event, the value is passed to the motorcontroller to control both motors
+                self.robotcontroller.motorcontroller.throttle_motor_1(action.value)
+                self.robotcontroller.motorcontroller.throttle_motor_2(
+                    -action.value
+                )  # negative value because of the reverse direction of the motor
+            # if the event type is not handled, print an error message
+            print(f"Event type not handled: {action.type}")
 
 
+# the Event class
 class Event:
+    # initialize the event object, with the value and the type of the event,
+    # using the enum class EventType, and the value of the event.
+    # using the kwargs.get() function so if there is no value, it will return None and not an error
     def __init__(self, **kwargs) -> None:
         self.value = kwargs.get("value")
         self.type = kwargs.get("type")
 
 
+# the EventType enum class
 class EventType:
     STEER = 0
     THROTTLE = 1
