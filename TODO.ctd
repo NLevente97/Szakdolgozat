@@ -7,8 +7,8 @@
    •  Logging
    •  Handling the steering event
    •  Using and handling the ultrasonic sensors
-   •  Maybe later change to 833 MHz, or 2.4GHz controller instead of ps4 controller with Bluetooth
-   •  New hardware(buck converter for the pi's powersupply, gears, and tracks)
+   •  Maybe later change to 833 MHz or 2.4GHz controller instead of ps4 controller with Bluetooth
+   •  New hardware(buck converter for the pi's powersupply, gears and tracks)
    •  Populate README.md with a description and a list of dependencies
    •  Refactor code
    •  Maybe use asyncio instead of threads(?)</rich_text>

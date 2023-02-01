@@ -4,7 +4,7 @@ from threading import Thread
 from eventhandler import Eventhandler
 
 
-# main class for the robot
+# main class for the robotcontroller
 class RobotController(object):
 
     # initialize the robot controller
