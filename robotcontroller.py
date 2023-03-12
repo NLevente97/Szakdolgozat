@@ -13,8 +13,7 @@ class RobotController(object):
 
         # the joystick data that are currently being used
         self.data = {
-            "L_Y": 0,
-            "L_X": 0,
+            "L": (0, 0),
             "SHARE": 0,
             "DONE": False,
             "Brake": False,

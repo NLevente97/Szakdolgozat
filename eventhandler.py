@@ -29,14 +29,14 @@ class Eventhandler(object):
                     # if there is a change creating an event object with the current state value
                     e = Event(value=self.current_state[key])
                     # checking for the keys that are currently handled by the program and setting an event type accordingly
-                    if key == "L_Y":
+                    if key == "L":
                         self.changed = True
                         # if np.sign(self.prev_state[key]) != np.sign(
                         #    self.current_state[key]
                         # ):
                         #    e.type = EventType.REVERSE
                         # else:
-                        e.type = EventType.THROTTLE
+                        e.type = EventType.MOVE
                     if key == "Brake":
                         self.changed = True
                         e.type = EventType.BRAKE
@@ -72,13 +72,11 @@ class Eventhandler(object):
             if action.type == EventType.BRAKE:
                 if action.value:
                     self.robotcontroller.motorcontroller.brake()
-            elif action.type == EventType.THROTTLE:
+            elif action.type == EventType.MOVE:
                 # for the THROTTLE event, the value is passed to the motorcontroller to control both motors
                 if self.robotcontroller.data["Brake"] == False:
-                    self.robotcontroller.motorcontroller.throttle_motor_1(action.value)
-                    self.robotcontroller.motorcontroller.throttle_motor_2(
-                        action.value
-                    )  # negative value because of the reverse direction of the motor
+                    self.robotcontroller.motorcontroller.throttle(action.value)
+            # negative value because of the reverse direction of the motor
             # elif action.type == EventType.REVERSE:
             #    if self.robotcontroller.data["Brake"] == False:
             #        self.robotcontroller.motorcontroller.throttle_motor_1(action.value)
@@ -108,8 +106,6 @@ class Event:
 
 # the EventType enum class
 class EventType:
-    STEER = 0
-    THROTTLE = 1
-    BRAKE = 2
-    REVERSE = 3
-    PULL = 8
+    MOVE = 0
+    BRAKE = 1
+    PULL = 2

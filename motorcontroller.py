@@ -64,6 +64,12 @@ class MotorController(object):
         # deinitializing the hat object
         self.hat.deinit()
 
+    def throttle(self, values: tuple) -> None:
+        value_motor1 = values[0]
+        value_motor2 = values[0]
+        self.throttle_motor_1(value_motor1)
+        self.throttle_motor_2(value_motor2)
+
     # the function that is called to control the motor 1 forward/backwards
     def throttle_motor_1(self, value: float) -> None:
         # setting the duty cycle of the motor channels to the value which calculated as:
