@@ -17,6 +17,7 @@ class RobotController(object):
             "L_X": 0,
             "SHARE": 0,
             "DONE": False,
+            "Brake": False,
         }
         # creating the controllers for the motors and the joystick and the event handler
         self.eventhandler = Eventhandler(robotcontroller=self)

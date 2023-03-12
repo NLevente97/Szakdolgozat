@@ -61,3 +61,10 @@ class JoystickController(Controller):
     def on_share_release(self):
         self.motorcontroller.robotcontroller.data["SHARE"] = 0
         self.motorcontroller.robotcontroller.data["DONE"] = True
+
+    # R2, "handbrake"
+    def on_R2_press(self, value):
+        self.motorcontroller.robotcontroller.data["Brake"] = True
+
+    def on_R2_release(self):
+        self.motorcontroller.robotcontroller.data["Brake"] = False

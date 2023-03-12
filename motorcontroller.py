@@ -41,10 +41,6 @@ class MotorController(object):
         # the hat object's channels list can be used to control the individual motors
         # connected to the pins corresponding to the channel's index
 
-        # setting the duty cycle of the LED channel to 65535, which means that the LED is fully on,
-        # signaling that the program is running
-        self.hat.channels[MotorController.LED_CHANNEL].duty_cycle = 65535
-
         # setting the duty cycle of the motor channels to the neutral value, so the ESCs can self calibrate
         self.hat.channels[
             MotorController.MOTOR_1_CHANNEL
@@ -55,12 +51,14 @@ class MotorController(object):
         # waiting for the ESCs to self calibrate
         time.sleep(1)
 
+        # setting the duty cycle of the LED channel to 65535, which means that the LED is fully on,
+        # signaling that the program is running and everything is ready to be used
+        self.hat.channels[MotorController.LED_CHANNEL].duty_cycle = 65535
+
     # the function that is called when the program is terminated
     def reset(self) -> None:
-        # setting the duty cycle of the motor channels to the neutral value, so the motors stop
-        self.hat.channels[
-            MotorController.MOTOR_1_CHANNEL
-        ].duty_cycle = MotorController.NEUTRAL
+        # braking
+        self.brake()
         # setting the duty cycle of the LED channel to 0, which means that the LED is fully off, signaling that the program has terminated
         self.hat.channels[MotorController.LED_CHANNEL].duty_cycle = 0
         # deinitializing the hat object
@@ -81,3 +79,12 @@ class MotorController(object):
         self.hat.channels[MotorController.MOTOR_2_CHANNEL].duty_cycle = int(
             MotorController.NEUTRAL + value * MotorController.DISTANCE_TO_NEUTRAL
         )
+
+    def brake(self) -> None:
+        # setting the duty cycle of the motor channels to the neutral value, so the motors stop
+        self.hat.channels[
+            MotorController.MOTOR_1_CHANNEL
+        ].duty_cycle = MotorController.NEUTRAL
+        self.hat.channels[
+            MotorController.MOTOR_2_CHANNEL
+        ].duty_cycle = MotorController.NEUTRAL

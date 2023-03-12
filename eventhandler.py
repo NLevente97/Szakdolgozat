@@ -1,5 +1,6 @@
 from threading import Thread
-
+import numpy as np
+import time
 
 # the class to handle the input events
 # handling the actions based on the difference during the current  and previous state of the system
@@ -30,7 +31,15 @@ class Eventhandler(object):
                     # checking for the keys that are currently handled by the program and setting an event type accordingly
                     if key == "L_Y":
                         self.changed = True
+                        # if np.sign(self.prev_state[key]) != np.sign(
+                        #    self.current_state[key]
+                        # ):
+                        #    e.type = EventType.REVERSE
+                        # else:
                         e.type = EventType.THROTTLE
+                    if key == "Brake":
+                        self.changed = True
+                        e.type = EventType.BRAKE
 
                     # adding the event object to the list of actions to be executed
                     self.actions.append(e)
@@ -58,15 +67,30 @@ class Eventhandler(object):
         actions = kwargs.get("actions")
         # looping through the actions list
         for action in actions:
+            print(action)
             # handling the actions based on the event type
-            if action.type == EventType.THROTTLE:
+            if action.type == EventType.BRAKE:
+                if action.value:
+                    self.robotcontroller.motorcontroller.brake()
+            elif action.type == EventType.THROTTLE:
                 # for the THROTTLE event, the value is passed to the motorcontroller to control both motors
-                self.robotcontroller.motorcontroller.throttle_motor_1(action.value)
-                self.robotcontroller.motorcontroller.throttle_motor_2(
-                    -action.value
-                )  # negative value because of the reverse direction of the motor
-            # if the event type is not handled, print an error message
-            print(f"Event type not handled: {action.type}")
+                if self.robotcontroller.data["Brake"] == False:
+                    self.robotcontroller.motorcontroller.throttle_motor_1(action.value)
+                    self.robotcontroller.motorcontroller.throttle_motor_2(
+                        action.value
+                    )  # negative value because of the reverse direction of the motor
+            # elif action.type == EventType.REVERSE:
+            #    if self.robotcontroller.data["Brake"] == False:
+            #        self.robotcontroller.motorcontroller.throttle_motor_1(action.value)
+            #        self.robotcontroller.motorcontroller.throttle_motor_2(-action.value)
+            elif action.type == EventType.STEER:
+                pass
+            elif action.type == EventType.PULL:
+                pass
+            else:
+                pass
+                # if the event type is not handled, print an error message
+                # print(f"Event type not handled: {action.type}")
 
 
 # the Event class
@@ -78,11 +102,14 @@ class Event:
         self.value = kwargs.get("value")
         self.type = kwargs.get("type")
 
+    def __str__(self) -> str:
+        return f"Event: \n type: { self.type},  value: {self.value}"
+
 
 # the EventType enum class
 class EventType:
     STEER = 0
     THROTTLE = 1
     BRAKE = 2
-    PULL = 8
+    REVERSE = 3
     PULL = 8
