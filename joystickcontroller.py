@@ -26,7 +26,8 @@ class JoystickController(Controller):
 
     # the callback function that is called when the controller is disconnected
     def disconnected(self):
-        pass
+        self.motorcontroller.reset()  # shutting down the motors
+        self.motorcontroller.data["DONE"] = True  # ending the program
 
     # functions for the left joystick
     # normalizing the value to be between 0 and 1
@@ -37,14 +38,12 @@ class JoystickController(Controller):
             self.motorcontroller.robotcontroller.data["L"][0],
             value / 32767,
         )
-        print(f"left {value}")
 
     def on_L3_right(self, value):
         self.motorcontroller.robotcontroller.data["L"] = (
             self.motorcontroller.robotcontroller.data["L"][0],
             value / 32767,
         )
-        print(f"right {value}")
 
     def on_L3_x_at_rest(self):
         self.motorcontroller.robotcontroller.data["L"] = (
@@ -84,7 +83,7 @@ class JoystickController(Controller):
 
     # R2, "handbrake"
     def on_R2_press(self, value):
-        self.motorcontroller.robotcontroller.data["Brake"] = True
+        self.motorcontroller.robotcontroller.data["BRAKE"] = True
 
     def on_R2_release(self):
-        self.motorcontroller.robotcontroller.data["Brake"] = False
+        self.motorcontroller.robotcontroller.data["BRAKE"] = False

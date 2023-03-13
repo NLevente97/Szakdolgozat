@@ -2,14 +2,15 @@ import board
 import busio
 import adafruit_pca9685
 import time
+from typing import Tuple
 
 # the class that controls the motors using the hat module for PCA9685 chip, which is a 12 bit PWM and servo control hat,
 # the i2c bus of the raspberry pi board and the adafruit library for the PCA9685 chip
 class MotorController(object):
 
     # constants for the motor controller
-    MOTOR_1_CHANNEL = 12  # channel for motor 1
-    MOTOR_2_CHANNEL = 13  # channel for motor 2
+    MOTOR_LEFT_CHANNEL = 12  # channel for the left motor
+    MOTOR_RIGHT_CHANNEL = 13  # channel for right motor
     SERVO_1_CHANNEL = 14  # channel for servo 1 (currently not used)
     LED_CHANNEL = 15  # channel for the LED that indicates that the program is running
 
@@ -43,10 +44,10 @@ class MotorController(object):
 
         # setting the duty cycle of the motor channels to the neutral value, so the ESCs can self calibrate
         self.hat.channels[
-            MotorController.MOTOR_1_CHANNEL
+            MotorController.MOTOR_LEFT_CHANNEL
         ].duty_cycle = MotorController.NEUTRAL
         self.hat.channels[
-            MotorController.MOTOR_2_CHANNEL
+            MotorController.MOTOR_RIGHT_CHANNEL
         ].duty_cycle = MotorController.NEUTRAL
         # waiting for the ESCs to self calibrate
         time.sleep(1)
@@ -64,33 +65,49 @@ class MotorController(object):
         # deinitializing the hat object
         self.hat.deinit()
 
-    def throttle(self, values: tuple) -> None:
-        value_motor1 = values[0]
-        value_motor2 = values[0]
-        self.throttle_motor_1(value_motor1)
-        self.throttle_motor_2(value_motor2)
+    def throttle(self, values: Tuple[float, float]) -> None:
+        value_motor_left = 0
+        value_motor_right = 0
+        
+        #balra előre (1.0,-1.0)
+        
+        value_motor_left+values[0]*MotorController.DISTANCE_TO_NEUTRAL
+        value_motor_right+value_motor_right*MotorController.DISTANCE_TO_NEUTRAL      +values[1]*MotorController.DISTANCE_TO_NEUTRAL
+        
+        print(values, end="\r")
+        if abs(0 - values[0] < 0.05):  # not moving forward or backwards
+            # reverse direction
+            value_motor_left = (
+                values[1] - 0
+            )  # the subtraction needed to match the ESC's time
+            value_motor_right = 0 - values[1]
+        elif abs(0 - values[1]) < 0.05:
+            value_motor_left = values[0]
+            value_motor_right = values[0]
+        self.throttle_motor_left(value_motor_left)
+        self.throttle_motor_right(value_motor_right)
 
     # the function that is called to control the motor 1 forward/backwards
-    def throttle_motor_1(self, value: float) -> None:
+    def throttle_motor_left(self, value: float) -> None:
         # setting the duty cycle of the motor channels to the value which calculated as:
         # the neutral value plus the distance to the neutral value multiplied by the value parameter,
         # the middlepoint is the neutral value, the value parameter is the scaled value of the joystick input (-1 to 1),
         # the distance to the neutral value is the distance between the minimum and the neutral value
-        self.hat.channels[MotorController.MOTOR_1_CHANNEL].duty_cycle = int(
+        self.hat.channels[MotorController.MOTOR_LEFT_CHANNEL].duty_cycle = int(
             MotorController.NEUTRAL + value * MotorController.DISTANCE_TO_NEUTRAL
         )
 
     # the function that is called to control the motor 2 forward/backwards
-    def throttle_motor_2(self, value: float) -> None:
-        self.hat.channels[MotorController.MOTOR_2_CHANNEL].duty_cycle = int(
+    def throttle_motor_right(self, value: float) -> None:
+        self.hat.channels[MotorController.MOTOR_RIGHT_CHANNEL].duty_cycle = int(
             MotorController.NEUTRAL + value * MotorController.DISTANCE_TO_NEUTRAL
         )
 
     def brake(self) -> None:
         # setting the duty cycle of the motor channels to the neutral value, so the motors stop
         self.hat.channels[
-            MotorController.MOTOR_1_CHANNEL
+            MotorController.MOTOR_LEFT_CHANNEL
         ].duty_cycle = MotorController.NEUTRAL
         self.hat.channels[
-            MotorController.MOTOR_2_CHANNEL
+            MotorController.MOTOR_RIGHT_CHANNEL
         ].duty_cycle = MotorController.NEUTRAL

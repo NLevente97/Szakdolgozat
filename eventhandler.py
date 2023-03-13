@@ -5,11 +5,15 @@ import time
 # the class to handle the input events
 # handling the actions based on the difference during the current  and previous state of the system
 class Eventhandler(object):
+
+    # threshold for the moving event, so a minimal change wont trigger one
+    MOVE_THRESHOLD = 0.05
+
     # intialize the event handler
     def __init__(self, **kwargs) -> None:
         super().__init__()
         # reference to the robotcontroller
-        self.robotcontroller = kwargs["robotcontroller"]
+        self.robotcontroller = kwargs.get("robotcontroller")
         # copying the data dictionary from the robotcontroller, so it wont be a reference but a new dictionary with the same values
         self.prev_state = self.robotcontroller.data.copy()
         self.current_state = self.robotcontroller.data.copy()
@@ -30,18 +34,20 @@ class Eventhandler(object):
                     e = Event(value=self.current_state[key])
                     # checking for the keys that are currently handled by the program and setting an event type accordingly
                     if key == "L":
-                        self.changed = True
-                        # if np.sign(self.prev_state[key]) != np.sign(
-                        #    self.current_state[key]
+                        # if (
+                        #     abs(self.prev_state[key][0] - self.current_state[key][0])
+                        #     > Eventhandler.MOVE_THRESHOLD
+                        #     or abs(self.prev_state[key][1] - self.current_state[key][1])
+                        #     > Eventhandler.MOVE_THRESHOLD
                         # ):
-                        #    e.type = EventType.REVERSE
-                        # else:
+                        self.changed = True
                         e.type = EventType.MOVE
-                    if key == "Brake":
+                    if key == "BRAKE":
                         self.changed = True
                         e.type = EventType.BRAKE
 
-                    # adding the event object to the list of actions to be executed
+                    # adding the event object to the list of actions to be executed only if the changed flag is set
+                    # if self.changed:
                     self.actions.append(e)
             # updating the previous state to the current state
             self.prev_state = self.current_state.copy()
@@ -67,15 +73,15 @@ class Eventhandler(object):
         actions = kwargs.get("actions")
         # looping through the actions list
         for action in actions:
-            print(action)
+            # print(action)
             # handling the actions based on the event type
             if action.type == EventType.BRAKE:
                 if action.value:
                     self.robotcontroller.motorcontroller.brake()
             elif action.type == EventType.MOVE:
                 # for the THROTTLE event, the value is passed to the motorcontroller to control both motors
-                if self.robotcontroller.data["Brake"] == False:
-                    self.robotcontroller.motorcontroller.throttle(action.value)
+                if self.robotcontroller.data["BRAKE"] == False:
+                    self.robotcontroller.motorcontroller.throttle(action.value) 
             # negative value because of the reverse direction of the motor
             # elif action.type == EventType.REVERSE:
             #    if self.robotcontroller.data["Brake"] == False:
